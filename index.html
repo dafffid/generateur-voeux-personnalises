@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Vœux LinkedIn Personnalisés</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 50px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        .input-group {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            color: #2c3e50;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 30px;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .response-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
+            border: 2px solid #e9ecef;
+        }
+
+        .response-title {
+            color: #2c3e50;
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .response-title::before {
+            content: "🎉";
+            font-size: 24px;
+        }
+
+        .response-box {
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+            color: #2c3e50;
+            font-size: 16px;
+            min-height: 120px;
+            white-space: pre-wrap;
+        }
+
+        .copy-btn {
+            padding: 12px 30px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-btn:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .copy-btn::before {
+            content: "📋";
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            padding: 30px;
+            font-size: 16px;
+        }
+
+        .loading::after {
+            content: "...";
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: "."; }
+            40% { content: ".."; }
+            60%, 100% { content: "..."; }
+        }
+
+        .error {
+            color: #e74c3c;
+            background: #fee;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .info-box {
+            background: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .info-box strong {
+            color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎊 Générateur de Vœux LinkedIn</h1>
+        <p class="subtitle">Créez des vœux personnalisés basés sur le profil de vos contacts</p>
+        
+        <div class="info-box">
+            <strong>💡 Comment ça marche ?</strong><br>
+            Entrez l'URL LinkedIn d'un contact de premier degré et notre IA générera des vœux personnalisés en analysant son profil professionnel.
+        </div>
+
+        <div class="input-group">
+            <label for="linkedin-url">URL du profil LinkedIn :</label>
+            <input type="text" 
+                   id="linkedin-url" 
+                   placeholder="https://www.linkedin.com/in/prenom-nom/" 
+                   value="">
+        </div>
+
+        <button class="generate-btn" onclick="generateWishes()" id="generate-btn">
+            ✨ Générer les vœux personnalisés
+        </button>
+
+        <div class="response-section">
+            <div class="response-title">Vos vœux personnalisés :</div>
+            <div class="response-box" id="response-text">
+                Les vœux personnalisés s'afficheront ici après la génération...
+            </div>
+            <button class="copy-btn" onclick="copyText()">Copier le message</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration du webhook n8n
+        const urlParams = new URLSearchParams(window.location.search);
+        const webhookUrl = urlParams.get('webhookUrl') || 'https://symbotis.app.n8n.cloud/webhook-test/voeux-linkedin';
+
+        async function generateWishes() {
+            const responseBox = document.getElementById('response-text');
+            const linkedinUrl = document.getElementById('linkedin-url').value;
+            const generateBtn = document.getElementById('generate-btn');
+            
+            if (!linkedinUrl) {
+                alert('Veuillez entrer une URL LinkedIn');
+                return;
+            }
+
+            // Validation basique de l'URL
+            if (!linkedinUrl.includes('linkedin.com/in/')) {
+                alert('Veuillez entrer une URL LinkedIn valide (ex: https://www.linkedin.com/in/prenom-nom/)');
+                return;
+            }
+
+            console.log('URL du webhook:', webhookUrl);
+            console.log('LinkedIn URL à envoyer:', linkedinUrl);
+
+            responseBox.innerHTML = '<div class="loading">Scraping du profil LinkedIn et génération des vœux personnalisés</div>';
+            generateBtn.disabled = true;
+            generateBtn.textContent = '⏳ Génération en cours...';
+            
+            try {
+                const payload = {
+                    linkedinUrl: linkedinUrl
+                };
+                
+                console.log('Payload envoyé:', payload);
+                
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                console.log('Statut de la réponse:', response.status);
+
+                // Lire la réponse comme texte d'abord
+                const responseText = await response.text();
+                console.log('Réponse brute:', responseText);
+
+                if (!response.ok) {
+                    throw new Error(`Erreur ${response.status}: ${responseText}`);
+                }
+
+                // Essayer de parser en JSON
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (e) {
+                    console.error('Erreur de parsing JSON:', e);
+                    throw new Error('La réponse n\'est pas du JSON valide: ' + responseText);
+                }
+                
+                console.log('Données parsées:', data);
+                
+                // Afficher le message de vœux généré
+                const wishesMessage = data.voeux || data.message || data.response || JSON.stringify(data);
+                responseBox.textContent = wishesMessage;
+                
+            } catch (error) {
+                console.error('Erreur complète:', error);
+                responseBox.innerHTML = `<div class="error">
+                    <strong>❌ Erreur</strong><br><br>
+                    ${error.message}<br><br>
+                    Vérifiez la console (F12) pour plus de détails.
+                </div>`;
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = '✨ Générer les vœux personnalisés';
+            }
+        }
+
+        function copyText() {
+            const responseText = document.getElementById('response-text').innerText;
+            
+            // Ne pas copier si c'est le message par défaut ou une erreur
+            if (responseText.includes('s\'afficheront ici') || responseText.includes('Erreur')) {
+                alert('Aucun message de vœux à copier pour le moment');
+                return;
+            }
+            
+            navigator.clipboard.writeText(responseText).then(() => {
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✅ Copié !';
+                btn.style.background = '#059669';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = '#10b981';
+                }, 2000);
+            }).catch(err => {
+                alert('Erreur lors de la copie : ' + err);
+            });
+        }
+
+        // Permettre de soumettre avec la touche Entrée
+        document.getElementById('linkedin-url').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateWishes();
+            }
+        });
+    </script>
+</body>
+</html>
